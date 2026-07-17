@@ -204,6 +204,13 @@ lv_indev_t * lv_event_get_indev(lv_event_t * e)
        e->code == LV_EVENT_SCROLL ||
        e->code == LV_EVENT_GESTURE ||
        e->code == LV_EVENT_KEY ||
+       e->code == LV_EVENT_KEY_PRESSED ||
+       e->code == LV_EVENT_KEY_SHORT_CLICKED ||
+       e->code == LV_EVENT_KEY_LONG_CLICKED ||
+       e->code == LV_EVENT_KEY_LONG_PRESSED ||
+       e->code == LV_EVENT_KEY_LONG_PRESSED_REPEAT ||
+       e->code == LV_EVENT_KEY_CLICKED ||
+       e->code == LV_EVENT_KEY_RELEASED ||
        e->code == LV_EVENT_FOCUSED ||
        e->code == LV_EVENT_DEFOCUSED ||
        e->code == LV_EVENT_LEAVE ||
@@ -246,15 +253,18 @@ const lv_area_t * lv_event_get_old_size(lv_event_t * e)
 
 uint32_t lv_event_get_key(lv_event_t * e)
 {
+    if(e->code < LV_EVENT_KEY || LV_EVENT_KEY_RELEASED < e->code) {
+        LV_LOG_WARN("Not interpreted with this event code");
+        return 0;
+    }
+
     if(e->code == LV_EVENT_KEY) {
         uint32_t * k = lv_event_get_param(e);
         if(k) return *k;
         else return 0;
     }
-    else {
-        LV_LOG_WARN("Not interpreted with this event code");
-        return 0;
-    }
+
+    return lv_indev_get_key(lv_indev_active());
 }
 
 int32_t lv_event_get_rotary_diff(lv_event_t * e)
